@@ -38,6 +38,7 @@ async function fetchRegion() {
                 createMarkup('option', `${inf.nom}`, selectRegion, [{ name: 'value', value: `${inf.code}` }]);
             }
         })
+        .catch((error) => console.log(`Erreure attrapée : `, error));
 }
 
 /**
@@ -65,6 +66,7 @@ async function fetchDepartement(code) {
                 fetchCommune(e.target.value)
             })
         })
+        .catch((error) => console.log(`Erreure attrapée : `, error));
 }
 
 /**
@@ -76,37 +78,40 @@ async function fetchCommune(code) {
     fetch(`https://geo.api.gouv.fr/departements/${code}/communes`)
         .then(rep => rep.json())
         .then(data => {
+            console.log(data)
             const selectCom = createMarkup('select', '', container, [{ name: 'class', value: 'form-select m-3' }, { name: "id", value: 'com' }]);
             createMarkup('option', 'selectionnez votre commune', selectCom, [{ name: 'selected' }]);
             for (const inf of data) {
+
                 createMarkup('option', `${inf.nom}`, selectCom, [{ name: 'value', value: `${inf.code}` }]);
             }
             selectCom.addEventListener('change', function (e) {
                 const elts = selectCom.options[selectCom.selectedIndex].text
                 const card = document.getElementById('card');
                 if (card) card.remove();
+                console.log(e.target.value)
                 fetchPostal(e.target.value, elts)
             })
         })
+        .catch((error) => console.log(`Erreure attrapée : `, error));
 }
 
 async function fetchPostal(cp, el) {
     fetch(`https://geo.api.gouv.fr/communes/${cp}`)
         .then(rep => rep.json())
         .then(data => {
-
-            console.log(data.population)
             console.log(el)
             createMarkup('div', `
             <div class="card" id="card" style="width: 18rem;">
                 <div class="card-body">
-                    <h2 class="card-title">${el}</h2>
+                    <h2 class="card-title">${data.nom}</h2>
                     <h3 class="card-subtitle mb-2 text-muted">Population : ${data.population}</h3>
-                    <p class="card-text">Code postal : ${cp}</p>
+                    <p class="card-text">Code postal : ${data.codesPostaux}</p>
                 </div>
             </div>`, containerTxt)
 
         })
+        .catch((error) => console.log(`Erreure attrapée : `, error));
 }
 // Création des éléments du  DOM via la fonction createMarkup
 
